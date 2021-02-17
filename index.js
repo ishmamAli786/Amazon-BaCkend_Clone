@@ -1,5 +1,6 @@
 //// library include
 require('dotenv').config();
+require('./database');
 const express=require('express');
 const app=express();
 const port=process.env.PORT;
