@@ -4,27 +4,27 @@ const moment=require('moment');
 
 const userSchema=new mongoose.Schema({
     username:{
-        type:string,
+        type:String,
         require:true,
     },
     email:{
-        type:string,
+        type:String,
         require:true
     },
     password:{
-        type:string,
+        type:String,
         required:true
     },
     Profile_Pic:{
-        type:string,
+        type:String,
         default:"empty-avatar.jpg"
     },
     createdAt:{
-        type:string,
+        type:String,
         default:moment().format("DD/MM/YYYY")+";"+moment().format("hh:mm:ss")
     },
     updatedAt:{
-        type:string,
+        type:String,
         default:moment().format("DD/MM/YYYY")+";"+moment().format("hh:mm:ss")
     },
 })

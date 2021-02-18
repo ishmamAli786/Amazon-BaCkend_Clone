@@ -6,6 +6,7 @@ const app=express();
 const port=process.env.PORT;
 const cors=require('cors');
 const morgan=require('morgan');
+const userRoute=require('./routes/users');
 
 
 
@@ -14,6 +15,7 @@ const morgan=require('morgan');
 ///middleware
 app.use(cors());
 app.use(morgan('dev'));
+app.use('/api/users',userRoute);
 
 
 
