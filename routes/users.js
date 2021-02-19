@@ -25,4 +25,29 @@ router.get('/',(req,res)=>{
 })
 
 
+///user register route
+router.post('/register',[
+    //check empty field
+    check('username').not().isEmpty().trim().escape(),
+    check('password').not().isEmpty().trim().escape(),
+    //check email
+    check('email').isEmail().normalizeEmail()
+
+],(req,res)=>{
+    const errors=validationResult(req);
+    ///check errors is not empty
+    if(!errors.isEmpty()){
+        return res.status(400).json({
+            status:false,
+            errors:errors.array()
+        })
+    }else{
+        return res.status(200).json({
+            status:true,
+            data:req.body
+        })
+    }
+})
+
+
 module.exports=router;
