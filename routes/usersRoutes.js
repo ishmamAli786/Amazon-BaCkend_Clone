@@ -33,7 +33,7 @@ router.post('/register',[
     //check email
     check('email').isEmail().normalizeEmail()
 
-],(req,res)=>{
+],(req,res)=>{ 
     const errors=validationResult(req);
     ///check errors is not empty
     if(!errors.isEmpty()){
@@ -41,12 +41,17 @@ router.post('/register',[
             status:false,
             errors:errors.array()
         })
-    }else{
-        return res.status(200).json({
-            status:true,
-            data:req.body
-        })
     }
+    const salt=bcrypt.genSaltSync(10)
+    const hashedPassword=bcrypt.hashSync(req.body.password,salt);
+
+
+    
+    return res.status(200).json({
+            status:true,
+            data:req.body,
+            hashedPassword:hashedPassword
+        })
 })
 
 
