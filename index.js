@@ -15,6 +15,7 @@ const userRoute=require('./routes/usersRoutes');
 ///middleware
 app.use(cors());
 app.use(morgan('dev'));
+app.use(express.static('public'));
 app.use('/api/user',userRoute);
 
 
