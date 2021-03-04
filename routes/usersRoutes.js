@@ -162,10 +162,14 @@ router.post('/login', [
                     })
                 }
                 else{
+                    ///JSON WEB Token Generate
+                    let token=jwt.sign({id:user._id,email:user.email},token_key,{expiresIn:3600})
                     ///login success
                 return res.status(200).json({
                     status: true,
-                    message:"User Login Successfully..."
+                    message:"User Login Successfully...",
+                    token:token,
+                    user:user
 
                 })
             }
