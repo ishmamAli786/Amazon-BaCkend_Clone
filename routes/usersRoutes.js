@@ -9,7 +9,7 @@ const moment = require('moment');
 const UserModel = require('.././models/user');
 const token_key = process.env.TOKEN_KEY;
 const storage = require('./storage');
-const verifyToken=require('./../middleware/verify_token');
+const verifyToken = require('./../middleware/verify_token');
 
 ///middleware setup
 router.use(bodyParser.json());
@@ -43,7 +43,7 @@ router.post('/register', [
         return res.status(400).json({
             status: false,
             errors: errors.array(),
-            message:"Form Validation Error..."
+            message: "Form Validation Error..."
         })
     }
 
@@ -106,22 +106,44 @@ router.post('/register', [
 
 
 /////upload Profile Pic Route
-router.post('/uploadProfilePic', (req, res) => {
+//// access private
+router.post('/uploadProfilePic', verifyToken, (req, res) => {
     let upload = storage.getProfilePicUpload();
     upload(req, res, (err) => {
-        console.log(req.file);
+        //if profile pic upload has errors
         if (err) {
             return res.status(400).json({
                 status: false,
                 message: "File Uplaod Failed....",
                 err: err
             });
-        } else {
-            return res.status(200).json({
-                status: true,
-                message: "File Uplaod Successfully",
+        }
+        ///if profile pic not uploaded
+        if (!req.file) {
+            return res.status(400).json({
+                status: false,
+                message: "Please Uplaod Profile Pic....",
             });
         }
+
+
+        let temp = { Profile_Pic: req.file.fieldname, updatedAt: moment().format("DD/MM/YYYY") + ";" + moment().format("hh:mm:ss") };
+        /// store new profile pic name to user document
+        UserModel.findOneAndUpdate({ _id: req.user.id }, { $set: temp })
+            .then((user) => {
+                return res.status(200).json({
+                    status: true,
+                    message: "File Uplaod Successfully",
+                    profile_pic: "https://localhost:4000/profile_pic/" + req.file.filename
+                });
+            }).catch((err) => {
+                return res.status(502).json({
+                    status: false,
+                    message: "Database Error..."
+
+                })
+            })
+
     })
 })
 
@@ -139,7 +161,7 @@ router.post('/login', [
         return res.status(400).json({
             status: false,
             errors: errors.array(),
-            message:"Form Validation Error..."
+            message: "Form Validation Error..."
         })
     }
     ///check email exist or not
@@ -151,34 +173,34 @@ router.post('/login', [
                     status: false,
                     message: "User don't Exist"
                 })
-            }else{
+            } else {
                 ///match user password
-                let isPasswordMatch=bcrypt.compareSync(req.body.password,user.password);
+                let isPasswordMatch = bcrypt.compareSync(req.body.password, user.password);
                 ///check  password is not matched
-                if(!isPasswordMatch){
+                if (!isPasswordMatch) {
                     return res.status(401).json({
                         status: false,
-                        message:"Password Don't Matched..."
-    
+                        message: "Password Don't Matched..."
+
                     })
                 }
-                else{
+                else {
                     ///JSON WEB Token Generate
-                    let token=jwt.sign({id:user._id,email:user.email},token_key,{expiresIn:3600})
+                    let token = jwt.sign({ id: user._id, email: user.email }, token_key, { expiresIn: 3600 })
                     ///login success
-                return res.status(200).json({
-                    status: true,
-                    message:"User Login Successfully...",
-                    token:token,
-                    user:user
+                    return res.status(200).json({
+                        status: true,
+                        message: "User Login Successfully...",
+                        token: token,
+                        user: user
 
-                })
-            }
+                    })
+                }
             }
         }).catch((error) => {
             return res.status(502).json({
                 status: false,
-                message:"Database Error..."
+                message: "Database Error..."
 
             })
         })
@@ -189,10 +211,10 @@ router.post('/login', [
 
 
 
-router.get('/testJWT',verifyToken,(req,res)=>{
+router.get('/testJWT', verifyToken, (req, res) => {
     return res.status(200).json({
         status: true,
-        message:"json web token working..."
+        message: "json web token working..."
 
     })
 })
